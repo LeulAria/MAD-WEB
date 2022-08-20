@@ -11,22 +11,11 @@ export interface Partner {
   logo: string;
 }
 
-const Home: NextPage = () => {
-  const [partners, setPartners] = useState<Partner[]>([]);
+interface Props {
+  partners: Partner[];
+}
 
-  const fetchPartners = async () => {
-    const url =
-      "https://autocomplete.clearbit.com/v1/companies/suggest?query=apple";
-    const json = await fetch(url, { mode: "cors" });
-    const res = await json.json();
-
-    setPartners(res as Partner[]);
-  };
-
-  useEffect(() => {
-    fetchPartners();
-  }, []);
-
+const Home: NextPage<Props> = ({ partners }) => {
   return (
     <div>
       <Head>
@@ -34,7 +23,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="flex min-h-[90vh] flex-col items-center justify-center">
+      <div className="flex min-h-[30vh] flex-col items-center justify-center">
         <section className="relative">
           <div
             className="absolute left-1/2 transform -translate-x-1/2 bottom-0 pointer-events-none opacity-40 z-50"
@@ -111,16 +100,29 @@ const Home: NextPage = () => {
         </section>
       </div>
 
-      <h1 className="text-center mb-20 text-2xl md:text-4xl font-[800]">
+      <h1 className="text-center mb-20 text-2xl md:text-4xl font-[800] text-gray-600">
         Our Partners
       </h1>
       <div className="flex flex-wrap justify-center">
-        {partners.map((partner, index) => (
+        {partners?.map((partner, index) => (
           <PartnerCard partner={partner} />
         ))}
       </div>
     </div>
   );
+};
+
+export const getServerSideProps = async () => {
+  const url =
+    "https://autocomplete.clearbit.com/v1/companies/suggest?query=apple";
+  const json = await fetch(url, { mode: "cors" });
+  const partners = await json.json();
+
+  return {
+    props: {
+      partners
+    }
+  };
 };
 
 export default Home;

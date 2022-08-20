@@ -1,3 +1,4 @@
+import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import MemberCard from "../components/MemberCard";
 
@@ -27,21 +28,11 @@ export interface Member {
   image: string;
 }
 
-const AboutUs = () => {
-  const [ourTeam, setOurTeam] = useState<Member[]>([]);
+interface Props {
+  ourTeam: Member[];
+}
 
-  const fetchOurTeam = async () => {
-    const url = "https://fakerapi.it/api/v1/persons?_quantity=7";
-    const json = await fetch(url, { mode: "cors" });
-    const res = await json.json();
-
-    setOurTeam(res.data as Member[]);
-  };
-
-  useEffect(() => {
-    fetchOurTeam();
-  }, []);
-
+const AboutUs: NextPage<Props> = ({ ourTeam }) => {
   return (
     <div className="px-[5%] mx-auto max-w-[1220px]">
       <div className=" mb-12 lg:ml-[6%]">
@@ -60,6 +51,18 @@ const AboutUs = () => {
       </div>
     </div>
   );
+};
+
+export const getServerSideProps = async () => {
+  const url = "https://fakerapi.it/api/v1/persons?_quantity=7";
+  const json = await fetch(url, { mode: "cors" });
+  const res = await json.json();
+
+  return {
+    props: {
+      ourTeam: res.data as Member[]
+    }
+  };
 };
 
 export default AboutUs;
